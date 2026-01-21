@@ -1,0 +1,69 @@
+SteerSuite Binary Trajectory Loader
+====================================
+
+Unity project for visualizing SteerSuite crowd simulation trajectories.
+Loads binary trajectory files and replays agent movements with obstacles.
+
+
+Requirements
+------------
+
+Unity 2021.3.x (tested with 2021.3.31f1)
+
+
+Quick Start
+-----------
+
+1. Clone or download this repository
+
+2. Open the project in Unity
+
+3. Open Assets/Scenes/SampleScene.unity
+
+4. Select the "Loader" GameObject in the Hierarchy
+
+5. In the Inspector, set "File Path" to your binary trajectory file
+
+6. Click "Load" button in the Inspector
+
+7. Enter Play mode to watch the trajectory playback
+
+
+Binary File Format
+------------------
+
+The loader expects a binary file with the following sequential structure:
+
+  Section 1: Object Types
+    - 4 bytes: int32 count N
+    - N * 4 bytes: int32 obstacle type codes
+      (0 = axis-aligned box, 1 = cylinder, 2 = rotated box)
+
+  Section 2: Object Info
+    - 4 bytes: int32 count M
+    - M * 4 bytes: float32 obstacle parameters (consumed per type)
+
+  Section 3: Parameters
+    - 4 bytes: int32 count P
+    - P * 4 bytes: float32 simulation parameters
+
+  Section 4+: Agent Trajectories (repeated for each agent)
+    - 4 bytes: int32 count T
+    - T * 4 bytes: float32 X,Z coordinate pairs per frame
+
+
+Variable Agent Sizes
+--------------------
+
+If your simulation uses variable agent sizes stored in the parameters section:
+
+1. Enable "Variable Agent Size" on the Loader component
+2. Set "Agent Size Index" to the parameter index of the first agent's size
+3. Set "Agent Size Offset" to the stride between agent size entries
+
+
+Notes
+-----
+
+All values are little-endian. Coordinates use Unity's coordinate system
+where Y is up (trajectories specify X,Z pairs; Y is set to 0).
